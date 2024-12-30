@@ -54,28 +54,34 @@ void DrawDigit(int x, int y, int digit, int length, int thickness) {
 
 // Draw the 7-segment timer
 void DrawTimer(int minutes, int seconds) {
-    int digitLength = 20;  // Length of each segment
-    int digitThickness = 5;  // Thickness of each segment
-    int spacing = 10;  // Space between digits
+    int digitLength = 40;  // Length of each segment
+    int digitThickness = 10;  // Thickness of each segment
+    int spacing = 15;  // Space between digits
 
-    int x = 50;
-    int y = 50;
+    int x = 20;
+    int y = 20;
 
     // Draw minutes (MM)
     DrawDigit(x, y, minutes / 10, digitLength, digitThickness);
     DrawDigit(x + digitLength + spacing, y, minutes % 10, digitLength, digitThickness);
 
     // Draw colon
-    Paint_DrawRectangle(x + 2 * (digitLength + spacing) - spacing / 2, y + digitLength / 2 - digitThickness,
-                        x + 2 * (digitLength + spacing) + spacing / 2, y + digitLength / 2 + digitThickness,
+    int colonWidth = digitThickness;  // Ensure uniform width for both dots
+    int colonHeight = digitThickness; // Ensure uniform height for both dots
+
+    // Top dot
+    Paint_DrawRectangle(x + 2 * (digitLength + spacing) - colonWidth / 2, y + digitLength / 2 - colonHeight / 2,
+                        x + 2 * (digitLength + spacing) + colonWidth / 2, y + digitLength / 2 + colonHeight / 2,
                         BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    Paint_DrawRectangle(x + 2 * (digitLength + spacing) - spacing / 2, y + digitLength + digitThickness,
-                        x + 2 * (digitLength + spacing) + spacing / 2, y + digitLength + digitThickness * 2,
+
+    // Bottom dot
+    Paint_DrawRectangle(x + 2 * (digitLength + spacing) - colonWidth / 2, y + digitLength + digitLength / 2 - colonHeight / 2,
+                        x + 2 * (digitLength + spacing) + colonWidth / 2, y + digitLength + digitLength / 2 + colonHeight / 2,
                         BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 
     // Draw seconds (SS)
-    DrawDigit(x + 2 * (digitLength + spacing), y, seconds / 10, digitLength, digitThickness);
-    DrawDigit(x + 3 * (digitLength + spacing), y, seconds % 10, digitLength, digitThickness);
+    DrawDigit(x + 15 + 2 * (digitLength + spacing), y, seconds / 10, digitLength, digitThickness);
+    DrawDigit(x + 15 + 3 * (digitLength + spacing), y, seconds % 10, digitLength, digitThickness);
 }
 
 int EPD_2in13_V3_test(void)
@@ -102,9 +108,9 @@ int EPD_2in13_V3_test(void)
     Paint_Clear(WHITE);
 
     Paint_SelectImage(BlackImage);
-
-    int minutes = 30;
-    int seconds = 0;
+    int minutes = 0;
+    int seconds = 2;
+    EPD_2in13_V3_Display_Base(BlackImage);
 
     for (;;) {
         Paint_Clear(WHITE);  // Clear the display
@@ -124,28 +130,27 @@ int EPD_2in13_V3_test(void)
             seconds--;
         }
     }
+    // Clear the screen before displaying "Time Over"
+    EPD_2in13_V3_Init();
+    EPD_2in13_V3_Clear();  // Ensure the display is fully cleared
+    Paint_Clear(WHITE);
 
     // Timer over message
-    Paint_Clear(WHITE);
     const char *timeOverMessage = "Time Over";
     int textX = 50;
     int textY = 50;
     Paint_DrawString_EN(textX, textY, timeOverMessage, &Font24, WHITE, BLACK);
     EPD_2in13_V3_Display_Base(BlackImage);
-
     DEV_Delay_ms(5000);  // Display "Time Over" for 5 seconds
 
     // Clear the screen and go to sleep
-    printf("Clear...\r\n");
     EPD_2in13_V3_Init();
     EPD_2in13_V3_Clear();
 
-    printf("Goto Sleep...\r\n");
     EPD_2in13_V3_Sleep();
     free(BlackImage);
     BlackImage = NULL;
     DEV_Delay_ms(2000);
-    printf("close 5V, Module enters 0 power consumption ...\r\n");
     DEV_Module_Exit();
     return 0;
 }
