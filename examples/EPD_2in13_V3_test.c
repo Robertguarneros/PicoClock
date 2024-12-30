@@ -116,7 +116,7 @@ int EPD_2in13_V3_test(void)
         DrawTimer(minutes, seconds);  // Draw the 7-segment timer
         EPD_2in13_V3_Display_Partial(BlackImage);
 
-        DEV_Delay_ms(1000);
+        sleep_ms(1000);
 
         // Timer countdown logic
         if (seconds == 0) {
@@ -159,7 +159,7 @@ int EPD_2in13_V3_test(void)
         DrawTimer(minutes, seconds);  // Draw the 7-segment timer
         EPD_2in13_V3_Display_Partial(BlackImage);
 
-        DEV_Delay_ms(1000);
+        sleep_ms(1000);
 
         // Timer countdown logic
         if (seconds == 0) {

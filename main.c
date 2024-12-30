@@ -6,7 +6,6 @@ int main(void)
 		
 	    // DEV_Delay_ms(10000); 
 	// }
-	DEV_Delay_ms(500); 
 	// EPD_2in9_V2_test();
     // EPD_2in9bc_test();
     // EPD_2in9b_V3_test();
