@@ -1,16 +1,4 @@
-/*****************************************************************************
-* | File      	:   Readme_EN.txt
-* | Author      :   Waveshare team
-* | Function    :   Help with use
-* | Info        :
-*----------------
-* |	This version:   V1.0
-* | Date        :   2021-02-04
-* | Info        :   Here is an English version of the documentation for your quick use.
-******************************************************************************/
-This file is to help you use this routine.
-Since our ink screens are getting more and more, it is not convenient for our maintenance, so all the ink screen programs are made into one project.
-A brief description of the use of this project is here:
+# PicoClock
 
 1. Basic information:
 This routine is verified using the corresponding module with the PICO. 
