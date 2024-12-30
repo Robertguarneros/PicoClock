@@ -1,122 +1,82 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "EPD_Test.h"
 #include "EPD_2in13_V3.h"
 
-// int EPD_2in13_V3_test(void)
-// {
-//     printf("EPD_2in13_V3_test Demo\r\n");
-//     if(DEV_Module_Init()!=0){
-//         return -1;
-//     }
+// Segment mapping for numbers 0-9
+const int segments[10][7] = {
+    {1, 1, 1, 0, 1, 1, 1}, // 0
+    {0, 0, 1, 0, 0, 1, 0}, // 1
+    {1, 0, 1, 1, 1, 0, 1}, // 2
+    {1, 0, 1, 1, 0, 1, 1}, // 3
+    {0, 1, 1, 1, 0, 1, 0}, // 4
+    {1, 1, 0, 1, 0, 1, 1}, // 5
+    {1, 1, 0, 1, 1, 1, 1}, // 6
+    {1, 0, 1, 0, 0, 1, 0}, // 7
+    {1, 1, 1, 1, 1, 1, 1}, // 8
+    {1, 1, 1, 1, 0, 1, 1}  // 9
+};
 
-//     printf("e-Paper Init and Clear...\r\n");
-// 	EPD_2in13_V3_Init();
-//     EPD_2in13_V3_Clear();
+// Draw a single segment
+void DrawSegment(int x, int y, int length, int thickness, int segment, int state) {
+    int offsetX = 0, offsetY = 0;
 
-//     //Create a new image cache
-//     UBYTE *BlackImage;
-//     UWORD Imagesize = ((EPD_2in13_V3_WIDTH % 8 == 0)? (EPD_2in13_V3_WIDTH / 8 ): (EPD_2in13_V3_WIDTH / 8 + 1)) * EPD_2in13_V3_HEIGHT;
-//     if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
-//         printf("Failed to apply for black memory...\r\n");
-//         return -1;
-//     }
-//     printf("Paint_NewImage\r\n");
-//     Paint_NewImage(BlackImage, EPD_2in13_V3_WIDTH, EPD_2in13_V3_HEIGHT, 90, WHITE);
-// 	Paint_Clear(WHITE);
+    // Set segment offsets
+    switch (segment) {
+        case 0: offsetX = length / 2; offsetY = 0; break;  // Top
+        case 1: offsetX = 0; offsetY = length / 2; break;  // Top-Left
+        case 2: offsetX = length; offsetY = length / 2; break;  // Top-Right
+        case 3: offsetX = length / 2; offsetY = length; break;  // Middle
+        case 4: offsetX = 0; offsetY = length + length / 2; break;  // Bottom-Left
+        case 5: offsetX = length; offsetY = length + length / 2; break;  // Bottom-Right
+        case 6: offsetX = length / 2; offsetY = length * 2; break;  // Bottom
+    }
 
-// #if 1   //show image for array    
-//     printf("show image for array\r\n");
-//     Paint_SelectImage(BlackImage);
-//     Paint_Clear(WHITE);
-//     Paint_DrawBitMap(gImage_2in13_2);
+    if (state) {
+        if (segment % 3 == 0) {  // Horizontal segments
+            Paint_DrawRectangle(x + offsetX - length / 2, y + offsetY - thickness / 2,
+                                x + offsetX + length / 2, y + offsetY + thickness / 2,
+                                BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+        } else {  // Vertical segments
+            Paint_DrawRectangle(x + offsetX - thickness / 2, y + offsetY - length / 2,
+                                x + offsetX + thickness / 2, y + offsetY + length / 2,
+                                BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+        }
+    }
+}
 
-//     EPD_2in13_V3_Display(BlackImage);
-//     DEV_Delay_ms(2000);
-// #endif
+// Draw a digit using 7-segment style
+void DrawDigit(int x, int y, int digit, int length, int thickness) {
+    for (int i = 0; i < 7; i++) {
+        DrawSegment(x, y, length, thickness, i, segments[digit][i]);
+    }
+}
 
-// #if 1  // Drawing on the image
-// 	Paint_NewImage(BlackImage, EPD_2in13_V3_WIDTH, EPD_2in13_V3_HEIGHT, 90, WHITE);  	
-//     printf("Drawing\r\n");
-//     //1.Select Image
-//     Paint_SelectImage(BlackImage);
-//     Paint_Clear(WHITE);
-	
-//     // 2.Drawing on the image
-//     Paint_DrawPoint(5, 10, BLACK, DOT_PIXEL_1X1, DOT_STYLE_DFT);
-//     Paint_DrawPoint(5, 25, BLACK, DOT_PIXEL_2X2, DOT_STYLE_DFT);
-//     Paint_DrawPoint(5, 40, BLACK, DOT_PIXEL_3X3, DOT_STYLE_DFT);
-//     Paint_DrawPoint(5, 55, BLACK, DOT_PIXEL_4X4, DOT_STYLE_DFT);
+// Draw the 7-segment timer
+void DrawTimer(int minutes, int seconds) {
+    int digitLength = 20;  // Length of each segment
+    int digitThickness = 5;  // Thickness of each segment
+    int spacing = 10;  // Space between digits
 
-//     Paint_DrawLine(20, 10, 70, 60, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-//     Paint_DrawLine(70, 10, 20, 60, BLACK, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
-//     Paint_DrawRectangle(20, 10, 70, 60, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-//     Paint_DrawRectangle(85, 10, 135, 60, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    int x = 50;
+    int y = 50;
 
-//     Paint_DrawLine(45, 15, 45, 55, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-//     Paint_DrawLine(25, 35, 70, 35, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-//     Paint_DrawCircle(45, 35, 20, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
-//     Paint_DrawCircle(110, 35, 20, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    // Draw minutes (MM)
+    DrawDigit(x, y, minutes / 10, digitLength, digitThickness);
+    DrawDigit(x + digitLength + spacing, y, minutes % 10, digitLength, digitThickness);
 
-//     Paint_DrawString_EN(140, 15, "waveshare", &Font16, BLACK, WHITE);
-//     Paint_DrawNum(140, 40, 123456789, &Font16, BLACK, WHITE);
+    // Draw colon
+    Paint_DrawRectangle(x + 2 * (digitLength + spacing) - spacing / 2, y + digitLength / 2 - digitThickness,
+                        x + 2 * (digitLength + spacing) + spacing / 2, y + digitLength / 2 + digitThickness,
+                        BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    Paint_DrawRectangle(x + 2 * (digitLength + spacing) - spacing / 2, y + digitLength + digitThickness,
+                        x + 2 * (digitLength + spacing) + spacing / 2, y + digitLength + digitThickness * 2,
+                        BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 
-//     Paint_DrawString_CN(140, 60, "���abc", &Font12CN, BLACK, WHITE);
-//     Paint_DrawString_CN(5, 65, "΢ѩ����", &Font24CN, WHITE, BLACK);
-
-//     EPD_2in13_V3_Display_Base(BlackImage);
-//     DEV_Delay_ms(3000);
-// #endif
-
-// #if 1   //Partial refresh, example shows time    		
-// 	Paint_NewImage(BlackImage, EPD_2in13_V3_WIDTH, EPD_2in13_V3_HEIGHT, 90, WHITE);  
-//     printf("Partial refresh\r\n");
-//     Paint_SelectImage(BlackImage);
-	
-//     PAINT_TIME sPaint_time;
-//     sPaint_time.Hour = 12;
-//     sPaint_time.Min = 34;
-//     sPaint_time.Sec = 56;
-//     UBYTE num = 10;
-//     for (;;) {
-//         sPaint_time.Sec = sPaint_time.Sec + 1;
-//         if (sPaint_time.Sec == 60) {
-//             sPaint_time.Min = sPaint_time.Min + 1;
-//             sPaint_time.Sec = 0;
-//             if (sPaint_time.Min == 60) {
-//                 sPaint_time.Hour =  sPaint_time.Hour + 1;
-//                 sPaint_time.Min = 0;
-//                 if (sPaint_time.Hour == 24) {
-//                     sPaint_time.Hour = 0;
-//                     sPaint_time.Min = 0;
-//                     sPaint_time.Sec = 0;
-//                 }
-//             }
-//         }
-//         Paint_ClearWindows(150, 80, 150 + Font20.Width * 7, 80 + Font20.Height, WHITE);
-//         Paint_DrawTime(150, 80, &sPaint_time, &Font20, WHITE, BLACK);
-
-//         num = num - 1;
-//         if(num == 0) {
-//             break;
-//         }
-// 		EPD_2in13_V3_Display_Partial(BlackImage);
-//         DEV_Delay_ms(500);//Analog clock 1s
-//     }
-// #endif
-
-// 	printf("Clear...\r\n");
-// 	EPD_2in13_V3_Init();
-//     EPD_2in13_V3_Clear();
-	
-//     printf("Goto Sleep...\r\n");
-//     EPD_2in13_V3_Sleep();
-//     free(BlackImage);
-//     BlackImage = NULL;
-//     DEV_Delay_ms(2000);//important, at least 2s
-//     // close 5V
-//     printf("close 5V, Module enters 0 power consumption ...\r\n");
-//     DEV_Module_Exit();
-//     return 0;
-// }
+    // Draw seconds (SS)
+    DrawDigit(x + 2 * (digitLength + spacing), y, seconds / 10, digitLength, digitThickness);
+    DrawDigit(x + 3 * (digitLength + spacing), y, seconds % 10, digitLength, digitThickness);
+}
 
 int EPD_2in13_V3_test(void)
 {
@@ -141,20 +101,14 @@ int EPD_2in13_V3_test(void)
     Paint_NewImage(BlackImage, EPD_2in13_V3_WIDTH, EPD_2in13_V3_HEIGHT, 90, WHITE);
     Paint_Clear(WHITE);
 
-    // Timer setup
-    Paint_NewImage(BlackImage, EPD_2in13_V3_WIDTH, EPD_2in13_V3_HEIGHT, 90, WHITE);
     Paint_SelectImage(BlackImage);
 
     int minutes = 30;
     int seconds = 0;
 
     for (;;) {
-        Paint_Clear(WHITE);  // Clear the display to white
-        char timeString[10];
-        snprintf(timeString, sizeof(timeString), "%02d:%02d", minutes, seconds);
-
-        // Draw the timer with black text and white background, centered
-        Paint_DrawString_EN(50, 50, timeString, &Font24, WHITE, BLACK);
+        Paint_Clear(WHITE);  // Clear the display
+        DrawTimer(minutes, seconds);  // Draw the 7-segment timer
         EPD_2in13_V3_Display_Partial(BlackImage);
 
         DEV_Delay_ms(1000);
@@ -171,6 +125,17 @@ int EPD_2in13_V3_test(void)
         }
     }
 
+    // Timer over message
+    Paint_Clear(WHITE);
+    const char *timeOverMessage = "Time Over";
+    int textX = 50;
+    int textY = 50;
+    Paint_DrawString_EN(textX, textY, timeOverMessage, &Font24, WHITE, BLACK);
+    EPD_2in13_V3_Display_Base(BlackImage);
+
+    DEV_Delay_ms(5000);  // Display "Time Over" for 5 seconds
+
+    // Clear the screen and go to sleep
     printf("Clear...\r\n");
     EPD_2in13_V3_Init();
     EPD_2in13_V3_Clear();
