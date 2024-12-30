@@ -86,7 +86,6 @@ void DrawTimer(int minutes, int seconds) {
 
 int EPD_2in13_V3_test(void)
 {
-    printf("EPD_2in13_V3_test Demo\r\n");
     if (DEV_Module_Init() != 0) {
         return -1;
     }
@@ -108,8 +107,8 @@ int EPD_2in13_V3_test(void)
     Paint_Clear(WHITE);
 
     Paint_SelectImage(BlackImage);
-    int minutes = 0;
-    int seconds = 2;
+    int minutes =25;
+    int seconds = 0;
     EPD_2in13_V3_Display_Base(BlackImage);
 
     for (;;) {
@@ -142,6 +141,46 @@ int EPD_2in13_V3_test(void)
     Paint_DrawString_EN(textX, textY, timeOverMessage, &Font24, WHITE, BLACK);
     EPD_2in13_V3_Display_Base(BlackImage);
     DEV_Delay_ms(5000);  // Display "Time Over" for 5 seconds
+
+
+// New 5 minute timer
+    EPD_2in13_V3_Init();
+    EPD_2in13_V3_Clear();  // Ensure the display is fully cleared
+    Paint_NewImage(BlackImage, EPD_2in13_V3_WIDTH, EPD_2in13_V3_HEIGHT, 90, WHITE);
+    Paint_Clear(WHITE);
+
+    Paint_SelectImage(BlackImage);
+    minutes = 5;
+    seconds = 0;
+    EPD_2in13_V3_Display_Base(BlackImage);
+
+    for (;;) {
+        Paint_Clear(WHITE);  // Clear the display
+        DrawTimer(minutes, seconds);  // Draw the 7-segment timer
+        EPD_2in13_V3_Display_Partial(BlackImage);
+
+        DEV_Delay_ms(1000);
+
+        // Timer countdown logic
+        if (seconds == 0) {
+            if (minutes == 0) {
+                break;  // Timer finished
+            }
+            minutes--;
+            seconds = 59;
+        } else {
+            seconds--;
+        }
+    }
+    // Clear the screen before displaying "Time Over"
+    EPD_2in13_V3_Init();
+    EPD_2in13_V3_Clear();  // Ensure the display is fully cleared
+    Paint_Clear(WHITE);
+
+    Paint_DrawString_EN(textX, textY, timeOverMessage, &Font24, WHITE, BLACK);
+    EPD_2in13_V3_Display_Base(BlackImage);
+    DEV_Delay_ms(5000);  // Display "Time Over" for 5 seconds
+
 
     // Clear the screen and go to sleep
     EPD_2in13_V3_Init();
