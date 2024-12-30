@@ -116,7 +116,7 @@ int EPD_2in13_V3_test(void)
         DrawTimer(minutes, seconds);  // Draw the 7-segment timer
         EPD_2in13_V3_Display_Partial(BlackImage);
 
-        sleep_ms(1000);
+        DEV_Delay_ms(500); //equivalent to 1 second
 
         // Timer countdown logic
         if (seconds == 0) {
@@ -159,7 +159,7 @@ int EPD_2in13_V3_test(void)
         DrawTimer(minutes, seconds);  // Draw the 7-segment timer
         EPD_2in13_V3_Display_Partial(BlackImage);
 
-        sleep_ms(1000);
+        DEV_Delay_ms(500); //equivalent to 1 second
 
         // Timer countdown logic
         if (seconds == 0) {
@@ -179,7 +179,7 @@ int EPD_2in13_V3_test(void)
 
     Paint_DrawString_EN(textX, textY, timeOverMessage, &Font24, WHITE, BLACK);
     EPD_2in13_V3_Display_Base(BlackImage);
-    DEV_Delay_ms(5000);  // Display "Time Over" for 5 seconds
+    DEV_Delay_ms(1500);  // Display "Time Over" for 5 seconds
 
 
     // Clear the screen and go to sleep
@@ -189,7 +189,7 @@ int EPD_2in13_V3_test(void)
     EPD_2in13_V3_Sleep();
     free(BlackImage);
     BlackImage = NULL;
-    DEV_Delay_ms(2000);
+    DEV_Delay_ms(1000);
     DEV_Module_Exit();
     return 0;
 }
