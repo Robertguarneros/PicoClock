@@ -117,10 +117,11 @@
 //     DEV_Module_Exit();
 //     return 0;
 // }
+
 int EPD_2in13_V3_test(void)
 {
     printf("EPD_2in13_V3_test Demo\r\n");
-    if(DEV_Module_Init()!=0){
+    if (DEV_Module_Init() != 0) {
         return -1;
     }
 
@@ -133,17 +134,12 @@ int EPD_2in13_V3_test(void)
     UWORD Imagesize = ((EPD_2in13_V3_WIDTH % 8 == 0) ? 
                        (EPD_2in13_V3_WIDTH / 8) : 
                        (EPD_2in13_V3_WIDTH / 8 + 1)) * EPD_2in13_V3_HEIGHT;
-    if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
+    if ((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
         printf("Failed to allocate memory...\r\n");
         return -1;
     }
     Paint_NewImage(BlackImage, EPD_2in13_V3_WIDTH, EPD_2in13_V3_HEIGHT, 90, WHITE);
     Paint_Clear(WHITE);
-
-    // Initial message
-    Paint_DrawString_EN(10, 10, "Press button to start timer", &Font16, WHITE, BLACK);
-    EPD_2in13_V3_Display_Base(BlackImage);
-    DEV_Delay_ms(3000);
 
     // Timer setup
     Paint_NewImage(BlackImage, EPD_2in13_V3_WIDTH, EPD_2in13_V3_HEIGHT, 90, WHITE);
@@ -153,12 +149,12 @@ int EPD_2in13_V3_test(void)
     int seconds = 0;
 
     for (;;) {
-        Paint_Clear(WHITE);  // Clear the display
+        Paint_Clear(WHITE);  // Clear the display to white
         char timeString[10];
         snprintf(timeString, sizeof(timeString), "%02d:%02d", minutes, seconds);
 
-        // Draw the timer
-        Paint_DrawString_EN(50, 80, timeString, &Font24, WHITE, BLACK);
+        // Draw the timer with black text and white background, centered
+        Paint_DrawString_EN(50, 50, timeString, &Font24, WHITE, BLACK);
         EPD_2in13_V3_Display_Partial(BlackImage);
 
         DEV_Delay_ms(1000);
