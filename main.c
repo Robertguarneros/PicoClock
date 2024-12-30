@@ -32,7 +32,7 @@ int main(void)
 	// EPD_4in2_test();
     // EPD_4in2_V2_test();
     // EPD_4in2b_V2_test();
-    EPD_4in2b_V2_test_old();
+    //EPD_4in2b_V2_test_old();
     // EPD_5in65f_test();
 
     // EPD_5in83_V2_test();
